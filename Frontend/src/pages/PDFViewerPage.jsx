@@ -4,7 +4,9 @@ import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
-pdfjs.GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@5.3.93/build/pdf.worker.min.js';
+// Use the local proxy endpoint for PDF.js worker
+const pdfJsWorkerPath = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/5.3.31/pdf.worker.min.mjs';
+pdfjs.GlobalWorkerOptions.workerSrc = pdfJsWorkerPath;
 
 const PDFViewerPage = () => {
   const location = useLocation();

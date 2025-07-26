@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
-import workerSrc from "pdfjs-dist/build/pdf.worker?url";
 
-pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
+// Use the local proxy endpoint for PDF.js worker
+const pdfJsWorkerPath = '/pdfjs/pdfjs-dist@5.3.93/build/pdf.worker.min.mjs';
+pdfjs.GlobalWorkerOptions.workerSrc = pdfJsWorkerPath;
 
 const PDFViewer = ({ pdfUrl }) => {
   const [numPages, setNumPages] = useState(null);

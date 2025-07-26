@@ -18,6 +18,14 @@ export default defineConfig({
     'process.env': {}
   },
   server: {
+    proxy: {
+      '/pdfjs': {
+        target: 'https://unpkg.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/pdfjs/, ''),
+        secure: false,
+      },
+    },
     cors: true,
     fs: {
       // Allow serving files from one level up from the package root
