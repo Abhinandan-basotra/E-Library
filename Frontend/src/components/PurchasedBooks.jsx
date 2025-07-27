@@ -18,9 +18,7 @@ const PurchasedBooks = () => {
             try {
                 setLoading(true);
                 const res = await axios.get(`${BOOK_API_END_POINT}/getAllBorrowedBooks`, { withCredentials: true });
-                console.log('API Response:', res.data); // Log the full response
                 if (res.data.success) {
-                    console.log('Borrowed Books:', res.data.borrowedBooks); // Log the books data
                     dispatch(setPurchasedBooks(res.data.borrowedBooks || []));
                 }
             } catch (error) {

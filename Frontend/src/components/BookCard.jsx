@@ -62,17 +62,18 @@ function BookCard({ book, isPurchased = false }) {
     setIsDropdownOpen(false);
   };
   const handleOpenPDF = (pdfUrl) => {
+    console.log('Opening PDF:', pdfUrl);
+    
     if (pdfUrl) {
-      // Ensure we have the raw URL format
       let finalUrl = pdfUrl;
-      if (finalUrl.includes('/image/upload/')) {
-        finalUrl = finalUrl.replace('/image/upload/', '/raw/upload/');
+      if (finalUrl.includes('/raw/upload/')) {
+        finalUrl = finalUrl.replace('/raw/upload/', '/image/upload/');
       }
       
       // Navigate to the PDF viewer page with the PDF data
       navigate('/pdf-viewer', {
         state: {
-          file: "C:\Users\abhin\Downloads\AtomicBook.pdf",
+          file: finalUrl,
           fileName: safeBook.title || 'document.pdf'
         }
       });
