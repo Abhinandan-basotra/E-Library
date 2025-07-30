@@ -43,3 +43,30 @@ export const dashBoard = async (req, res) => {
         });
     }
 };
+
+export const getAllBooksWrittenByAdmin = async (req, res) => {
+    try {
+        const user = req.id;
+        const admin = await User.findById(user);
+        if (!admin || admin.role !== "admin") {
+            return res.status(403).json({
+                message: "Unauthorized access",
+                success: false
+            });
+        }
+        const adminId = admin._id;
+        const books = await Book.find({ adminId }).populate('title').sort({ createdAt: -1 });
+        return res.json({
+            success: true,
+            books: books || [],
+            message: "Books fetched successfully"
+        });
+    } catch (error) {
+        console.error("Error fetching books written by admin:", error);
+        return res.status(500).json({
+            message: "Failed to fetch books",
+            success: false
+        });
+        
+    }
+}

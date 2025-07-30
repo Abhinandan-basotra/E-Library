@@ -2,13 +2,11 @@ import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Select, SelectItem, SelectTrigger, SelectValue, SelectContent } from "@/components/ui/select";
-import { Card, CardContent } from "@/components/ui/card";
 import BookCard from "./BookCard";
 import Navbar from "./shared/Navbar";
 import Footer from "./shared/Footer";
 import useGetAllBooks from "../hooks/useGetAllBooks";
 import { useDispatch, useSelector } from "react-redux";
-import store from "../redux/store";
 
 const BrowseSection = () => {
     useGetAllBooks();

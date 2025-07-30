@@ -13,7 +13,15 @@ const authSlice = createSlice({
             state.loading = action.payload;
         },
         setUser: (state, action) => {
-            state.user = action.payload;
+            if (!action.payload) {
+                state.user = null;
+                return;
+            }
+            const userData = {
+                ...action.payload,
+                phoneNumber: action.payload.phoneNumber || (action.payload.profile?.phoneNumber || '')
+            };
+            state.user = userData;
         },
         setNumberOfBorrowedBooks: (state, action) => {
             state.numberOfBorrowedBooks = action.payload;

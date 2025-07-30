@@ -62,7 +62,6 @@ function BookCard({ book, isPurchased = false }) {
     setIsDropdownOpen(false);
   };
   const handleOpenPDF = (pdfUrl) => {
-    console.log('Opening PDF:', pdfUrl);
     
     if (pdfUrl) {
       let finalUrl = pdfUrl;

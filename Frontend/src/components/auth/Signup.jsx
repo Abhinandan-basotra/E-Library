@@ -64,7 +64,6 @@ const Signup = () => {
   
     try {
       dispatch(setLoading(true));
-      console.log("Submitting user data:", userData);
   
       const res = await axios.post(`${USER_API_END_POINT}/register`, userData, {
         headers: {
@@ -81,7 +80,6 @@ const Signup = () => {
         toast.error(res.data.message);
       }
     } catch (error) {
-      console.error("Signup Error:", error.response);
       toast.error(error.response?.data?.message || "Registration failed. Please try again.");
     } finally {
       dispatch(setLoading(false));

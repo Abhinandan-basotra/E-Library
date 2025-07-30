@@ -34,6 +34,7 @@ const Login = () => {
     e.preventDefault();
     try {
       dispatch(setLoading(true));
+      
       const res = await axios.post(`${USER_API_END_POINT}/login`, input, {
         headers: { 
           'Content-Type': 'application/json',
@@ -45,18 +46,22 @@ const Login = () => {
       if (res.data.success) {
         // Check if we have the user data in the response
         if (res.data.user) {
-          dispatch(setUser(res.data.user));
+          // Ensure all user data is properly passed to Redux
+          const userData = {
+            ...res.data.user,
+            // Ensure phoneNumber is included in the user object
+            phoneNumber: res.data.user.phoneNumber || (res.data.user.profile?.phoneNumber || '')
+          };
+          dispatch(setUser(userData));
           toast.success(res.data.message || 'Login successful!');
           
-          // Verify the cookie was set by making a test request
-          try {
-            const testRes = await axios.get(`${USER_API_END_POINT}/verify`, { withCredentials: true });
-            console.log('Session verification:', testRes.data);
-          } catch (testErr) {
-            console.error('Session verification failed:', testErr);
+          // Redirect based on user role
+          if (input.role === 'admin' || res.data.user.role === 'admin') {
+            console.log('Redirecting to admin dashboard');
+            navigate('/admin/dashboard');
+          } else {
+            navigate('/');
           }
-          
-          navigate('/');
         } else {
           throw new Error('User data not received');
         }
@@ -65,7 +70,6 @@ const Login = () => {
       }
 
     } catch (error) {
-      console.error("Error response:", error.response.data.message);
       toast.error(error.response?.data?.message || "Login failed");
     } finally {
       dispatch(setLoading(false));
@@ -76,9 +80,14 @@ const Login = () => {
 
   useEffect(() => {
     if (user) {
-      navigate("/");
+      if (user.role === 'admin') {
+        navigate('/admin/dashboard');
+      } else {
+        navigate('/');
+      }
     }
-  }, [])
+  }, [user, navigate]);
+  
 
   return (
     <>

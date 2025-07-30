@@ -144,19 +144,21 @@ export const logout = (req, res) => {
 
 export const updateProfile = async (req, res) => {
     try {
-        const {fullname, email, phoneNumber, bio, profilePhoto} = req.body;
+        const {fullname, email, phoneNumber, bio} = req.body;
         const userId = req.id;
-        //cloudinary things
-        const file = req.file;
-        if(file){
+        let profilePhoto;
+        
+        // Handle profile photo upload if present
+        if (req.files && req.files.profilePhoto) {
             try {
-                const fileUri = getDataUri(file);
-                const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
-                profilePhoto = cloudResponse.secure_url;
+                const profilePhotoFile = req.files.profilePhoto[0];
+                const fileUri = getDataUri(profilePhotoFile);
+                const cloudResponse = await cloudinary.uploader.upload(fileUri.content).then(response => response.secure_url);
+                profilePhoto = cloudResponse;
             } catch (error) {
                 console.error("Cloudinary Upload Error:", error);
                 return res.status(500).json({
-                    message: "Error uploading profile photo",
+                    message: "Error uploading profile photo: " + error.message,
                     success: false
                 });
             }
