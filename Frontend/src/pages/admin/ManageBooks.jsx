@@ -4,8 +4,11 @@ import { FiEdit2, FiTrash2, FiPlus } from 'react-icons/fi';
 import api from '../../utils/api';
 import { toast } from 'react-toastify';
 import { ADMIN_API_END_POINT, BOOK_API_END_POINT } from '../../utils/constant';
+import { useDispatch, useSelector } from 'react-redux';
+import { deleteBook } from '../../redux/bookSlice';
 
 const ManageBooks = () => {
+  const dispatch = useDispatch();
   const [books, setBooks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -48,16 +51,22 @@ const ManageBooks = () => {
     }
   };
 
-  const handleDelete = async (bookId) => {
+  const error = useSelector((state) => state.book?.error);
+
+  const handleDelete = (bookId) => {
     if (window.confirm('Are you sure you want to delete this book?')) {
-      try {
-        await api.get(`${BOOK_API_END_POINT}/delete/${bookId}`);
-        toast.success('Book deleted successfully');
-        fetchBooks();
-      } catch (error) {
-        console.error('Error deleting book:', error);
-        toast.error('Failed to delete book');
-      }
+      dispatch(deleteBook(bookId))
+        .unwrap()
+        .then(() => {
+          // Update local state
+          const updatedBooks = books.filter(book => book._id !== bookId);
+          setBooks(updatedBooks);
+          toast.success('Book deleted successfully');
+        })
+        .catch((error) => {
+          console.error('Error deleting book:', error);
+          toast.error(error || 'Failed to delete book');
+        });
     }
   };
 

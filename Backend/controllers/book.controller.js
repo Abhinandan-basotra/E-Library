@@ -1,7 +1,9 @@
 import { User } from '../models/user.model.js';
 import { Book } from '../models/book.model.js';
+import { Borrowing } from '../models/borrowing.model.js';
 import cloudinary from 'cloudinary';
 import getDataUri from '../utils/getDataUri.js';
+import mongoose from 'mongoose';
 
 export const addBook = async (req, res) => {
     try {
@@ -50,12 +52,10 @@ export const addBook = async (req, res) => {
                     overwrite: true
                 })
                     .then(response => {
-                        console.log("Cloudinary upload response:", response);
                         // Manually construct the URL to use raw/upload
                         const publicId = response.public_id;
                         const version = response.version;
                         bookUrl = `https://res.cloudinary.com/${process.env.CLOUD_NAME}/raw/upload/v${version}/${publicId}.pdf`;
-                        console.log("Generated book URL:", bookUrl);
                     })
                     .catch(error => {
                         console.error("Error uploading to Cloudinary:", error);
@@ -252,29 +252,60 @@ export const updateBook = async (req, res) => {
 };
 
 export const deleteBook = async (req, res) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    
     try {
         const bookId = req.params.bookId;
         const userId = req.id;
-        const user = await User.findById(userId);
+        
+        // Verify user exists and is admin
+        const user = await User.findById(userId).session(session);
         if (!user) {
+            await session.abortTransaction();
+            session.endSession();
             return res.status(404).json({
                 message: "User not found",
                 success: false
             });
         }
+        
         if (user.role !== 'admin') {
+            await session.abortTransaction();
+            session.endSession();
             return res.status(403).json({
                 message: "User does not have permission to delete books",
                 success: false
             });
         }
-        const book = await Book.findByIdAndDelete(bookId);
+        
+        // Find and delete the book
+        const book = await Book.findByIdAndDelete(bookId).session(session);
         if (!book) {
+            await session.abortTransaction();
+            session.endSession();
             return res.status(404).json({
                 message: "Book not found",
                 success: false
             });
         }
+        
+        // Remove the book from all users' borrowedBooks arrays
+        await User.updateMany(
+            { borrowedBooks: bookId },
+            { $pull: { borrowedBooks: bookId } },
+            { session }
+        );
+        
+        // Delete all borrowing records for this book
+        await Borrowing.deleteMany(
+            { bookId },
+            { session }
+        );
+        
+        await session.commitTransaction();
+        session.endSession();
+        
         return res.status(200).json({
             message: "Book deleted successfully",
             book,

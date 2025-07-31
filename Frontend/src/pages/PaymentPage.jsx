@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { Loader2 } from 'lucide-react';
+import { Loader2, StepBack } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { incrementBorrowedBooks, setNumberOfBorrowedBooks } from '../redux/authSlice';
 import api from '../utils/api';
@@ -26,6 +26,7 @@ function PaymentPage() {
 
   // Get book and payment type from location state
   const { book, paymentType } = location.state || {};
+  const [step, setStep] = useState(1);
   
   // Calculate amount based on payment type
   const amount = paymentType === 'Buy' 
@@ -69,11 +70,7 @@ function PaymentPage() {
         // Update the number of borrowed books in Redux
         dispatch(setNumberOfBorrowedBooks(currentBorrowedCount + 1));
         toast.success(`Payment of $${amount.toFixed(2)} for ${book?.title} (${paymentType}) was successful!`);
-        
-        // Navigate to home after a short delay
-        setTimeout(() => {
-          navigate('/myLibrary');
-        }, 1500);
+        setStep(2);
       } else {
         throw new Error(response.data.message || 'Failed to add book to your library');
       }
@@ -89,6 +86,13 @@ function PaymentPage() {
   if (!book || !paymentType) {
     return null;
   }
+  useEffect(() => {
+    if (step === 2) {
+      setTimeout(() => {
+        navigate('/myLibrary');
+      }, 1000);
+    }
+  })
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-2xl">

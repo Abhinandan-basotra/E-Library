@@ -38,7 +38,7 @@ function CategoriesSection() {
         </div>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
           {categories.map((category, index) => (
-              <Link to={`/browse?category=${category.key}`}>
+              <Link to={`/browse?category=${category.key}`} key={category.key}>
               <Card key={index} className="relative group overflow-hidden cursor-pointer bg-white hover:shadow-xl transition-shadow">
                 <CardContent className="p-6 flex items-center justify-center text-center h-32">
                   <h3 className="font-medium text-lg">{category.name}</h3>
