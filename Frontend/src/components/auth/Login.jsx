@@ -7,7 +7,6 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { User, Lock, Mail, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
-import Navbar from '../shared/Navbar';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { setLoading, setUser } from '../../redux/authSlice';
@@ -91,7 +90,6 @@ const Login = () => {
 
   return (
     <>
-      <Navbar />
       <div className="flex items-center justify-center min-h-screen bg-green-50">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
           <Card className="w-96 shadow-lg border-green-200 border-2">
